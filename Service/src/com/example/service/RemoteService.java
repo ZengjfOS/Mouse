@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class RemoteService {
 	static Robot robot;
 	static Point point;
-	public static final int MESSAGE_PORT = 5000;
+	public static final int MESSAGE_PORT = 9999;
 
 	public static void main(String[] args) throws AWTException,
 			InterruptedException, IOException {
@@ -23,28 +23,20 @@ public class RemoteService {
 		// System.out.println("pointx  " + point.getX() + " pointy " +
 		// point.getY());
 		robot = new Robot();
-		reciveUpdData();
-	}
-
-	public static void reciveUpdData() {
-		while (true) {
-			try {
-				DatagramSocket server = new DatagramSocket(MESSAGE_PORT);
-				byte[] recvBuf = new byte[100];
-				DatagramPacket recvPacket = new DatagramPacket(recvBuf,
-						recvBuf.length);
-				server.receive(recvPacket);
-				String recvStr = new String(recvPacket.getData(), 0,
-						recvPacket.getLength());
-				// System.out.println(recvStr);
-				server.close();
-				byte[] recvData = getByteArraysByString(recvStr);
-				System.out.println(recvData.length + "         "
-						+ Arrays.toString(recvData));
-				 controlMouseByDate(recvData);
-			} catch (Exception e) {
-				// TODO: handle exception
+		UdpServiceUtils udpServiceUtils = UdpServiceUtils.getInstence();
+		try {
+			while (true) {
+				String  reciveData = udpServiceUtils.reciveUpdData();	
+				if(reciveData.equals("")){
+					break;
+				}
+				byte[] recvData = getByteArraysByString(reciveData);
+				
+				controlMouseByDate(recvData);
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
